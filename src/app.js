@@ -29,7 +29,8 @@ app.use('/api', (req, res, next) => {
     .catch((e) => {
       storePromise = null;
       console.error("Omborga ulanib bo'lmadi:", e);
-      res.status(503).json({ error: "Ma'lumotlar bazasiga ulanib bo'lmadi. Birozdan keyin qayta urinib ko'ring." });
+      const hint = /MONGODB_URI/.test(e.message) ? e.message : "Ma'lumotlar bazasiga ulanib bo'lmadi. Birozdan keyin qayta urinib ko'ring.";
+      res.status(503).json({ error: hint });
     });
 });
 
@@ -39,6 +40,11 @@ const wrap = (fn) => (req, res) =>
     console.error(e);
     res.status(500).json({ error: 'Serverda xatolik yuz berdi' });
   });
+
+// Server va ombor holatini tekshirish (sozlashda foydali)
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, store: store.kind, adminPasswordSet: !!process.env.ADMIN_PASSWORD, node: process.version });
+});
 
 // O'quvchiga savolni javobisiz yuboramiz
 function publicQuestion(test) {

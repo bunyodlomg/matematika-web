@@ -1,11 +1,6 @@
 // Netlify Function: butun /api/* so'rovlarini Express ilovasiga uzatadi.
+// Netlify'da MONGODB_URI muhit o'zgaruvchisi bo'lishi shart.
 const serverless = require('serverless-http');
-const { connectLambda } = require('@netlify/blobs');
 const app = require('../../src/app');
 
-const handler = serverless(app);
-
-exports.handler = async (event, context) => {
-  connectLambda(event); // Netlify Blobs'ni shu so'rov uchun ulaydi
-  return handler(event, context);
-};
+exports.handler = serverless(app);

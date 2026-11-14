@@ -38,28 +38,68 @@ npm start
 `MONGODB_URI` bo'sh bo'lsa, natijalar `data/db.json` fayliga yoziladi.
 Botdagi MongoDB manzilini qo'ysangiz, natijalar MongoDB'da (`tests` kolleksiyasi) saqlanadi.
 
-## Internetga joylash: Netlify (tavsiya etiladi)
+## O'z serveringizga joylash (VPS, Ubuntu)
 
-Loyiha Netlify uchun tayyor (`netlify.toml`). Natijalar Netlify'ning o'z omborida
-(Netlify Blobs) saqlanadi, alohida bazani sozlash shart emas.
+Kerak: Node.js 18 yoki yangiroq. Quyidagi buyruqlar Ubuntu uchun.
 
-1. Loyihani GitHub'ga yuklang.
-2. [Netlify](https://app.netlify.com) → **Add new site → Import an existing project** → GitHub → shu repozitoriy.
-   Build sozlamalarini o'zgartirmang, ular `netlify.toml` dan olinadi.
-3. **Site configuration → Environment variables** bo'limida `ADMIN_PASSWORD` qo'shing
-   (o'qituvchi paneli paroli), keyin **Deploys → Trigger deploy** ni bosing.
-4. Netlify bergan havolani (masalan `https://matematika.netlify.app`) o'quvchilarga yuboring,
-   o'zingiz `.../admin` orqali kirasiz.
+**1. Node.js va pm2 o'rnatish** (bir marta)
 
-GitHub'ga har safar o'zgarish yuklanganda sayt o'zi yangilanadi.
-`MONGODB_URI` ni ham qo'shsangiz, natijalar Netlify Blobs o'rniga MongoDB'da saqlanadi.
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo npm install -g pm2
+```
 
-### Boshqa variant: Render + MongoDB Atlas
+**2. Loyihani serverga ko'chirish**
 
-1. [MongoDB Atlas](https://www.mongodb.com/atlas) da bepul klaster oching va ulanish manzilini oling.
-2. [Render](https://render.com) → **New → Web Service** → GitHub reponi tanlang.
-   Build command: `npm install`, Start command: `npm start`,
-   Environment: `ADMIN_PASSWORD` va `MONGODB_URI`.
+```bash
+git clone https://github.com/bunyodlomg/matematika-web.git
+cd matematika-web
+npm install --omit=dev
+cp .env.example .env
+nano .env        # ADMIN_PASSWORD ni o'zgartiring; MONGODB_URI ixtiyoriy
+```
+
+**3. Ishga tushirish va server qayta yonganda avtomatik ishlashi**
+
+```bash
+pm2 start ecosystem.config.js
+pm2 save
+pm2 startup      # chiqqan buyruqni nusxalab ishga tushiring
+```
+
+Tekshirish: `curl http://localhost:3000/api/health` → `{"ok":true,...}` qaytishi kerak.
+
+**4. Domen va HTTPS (nginx)**
+
+```bash
+sudo apt-get install -y nginx certbot python3-certbot-nginx
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/matematika
+sudo nano /etc/nginx/sites-available/matematika   # server_name ga domeningizni yozing
+sudo ln -s /etc/nginx/sites-available/matematika /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d matematika.example.uz
+```
+
+Domen bo'lmasa, 4-qadamni o'tkazib yuboring va `http://SERVER_IP:3000` orqali kiring
+(firewall'da 3000-portni oching: `sudo ufw allow 3000`).
+
+**Yangilash:** `git pull && npm install --omit=dev && pm2 restart matematika`
+
+**Natijalar qayerda:** `MONGODB_URI` bo'sh bo'lsa — `data/db.json` faylida. Bu faylni vaqti-vaqti bilan
+nusxalab qo'ying. O'qituvchi panelidagi "Excel'ga yuklab olish" ham zaxira vazifasini bajaradi.
+
+**Xato chiqsa:** `pm2 logs matematika` — server jurnali.
+
+## Boshqa variantlar
+
+- **Hosting panel (cPanel / "Setup Node.js App"):** Application startup file — `server.js`,
+  so'ng "Run NPM Install" va muhit o'zgaruvchilariga `ADMIN_PASSWORD` qo'shing.
+- **Render:** New → Web Service, Build: `npm install`, Start: `npm start`,
+  Environment: `ADMIN_PASSWORD` va `MONGODB_URI` (bepul tarifda fayl o'chib ketadi, shuning uchun MongoDB shart).
+- **Netlify:** `netlify.toml` tayyor, lekin u yerda fayl saqlanmaydi, shuning uchun
+  Environment variables'ga `MONGODB_URI` (masalan, bepul [MongoDB Atlas](https://www.mongodb.com/atlas))
+  va `ADMIN_PASSWORD` qo'shish shart.
 
 ## Tuzilishi
 
@@ -69,7 +109,9 @@ src/app.js           Express ilovasi va API
 netlify/functions/   Netlify uchun API funksiyasi
 netlify.toml         Netlify sozlamalari
 src/questions.js     Misollar generatori (sinf × daraja)
-src/store.js         Saqlash: MongoDB, Netlify Blobs yoki data/db.json
+src/store.js         Saqlash: MongoDB yoki data/db.json
+ecosystem.config.js  pm2 sozlamasi
+deploy/nginx.conf    Nginx namunasi
 public/index.html    O'quvchi sahifasi (+ app.js)
 public/admin.html    O'qituvchi paneli (+ admin.js)
 public/style.css     Umumiy dizayn

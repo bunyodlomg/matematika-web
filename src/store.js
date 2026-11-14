@@ -1,5 +1,5 @@
 // Ma'lumotlar ombori.
-// MONGODB_URI berilgan bo'lsa — MongoDB, aks holda — data/db.json fayli.
+// MONGODB_URI berilgan bo'lsa — MongoDB, aks holda — data/db.json fayli (o'z serveringizda).
 // Har bir test (urinish) bitta hujjat: o'quvchi ma'lumotlari, savollar, javoblar, vaqtlar.
 
 const fs = require('fs');
@@ -65,7 +65,7 @@ async function mongoStore(uri) {
     { _id: String },
     { strict: false, versionKey: false, minimize: false }
   );
-  const Test = mongoose.model('Test', schema, 'tests');
+  const Test = mongoose.models.Test || mongoose.model('Test', schema, 'tests');
   return {
     kind: 'MongoDB',
     async createTest(t) {
@@ -88,43 +88,13 @@ async function mongoStore(uri) {
   };
 }
 
-// ---------- Netlify Blobs ombori (Netlify'da tashqi bazasiz ishlaydi) ----------
-function blobStore() {
-  const { getStore } = require('@netlify/blobs');
-  const db = getStore({ name: 'tests', consistency: 'strong' });
-  return {
-    kind: 'Netlify Blobs',
-    async createTest(t) {
-      t._id = newId();
-      await db.setJSON(t._id, t);
-      return t;
-    },
-    async getTest(id) {
-      if (!/^[a-f0-9]{24}$/.test(String(id))) return null;
-      return db.get(String(id), { type: 'json' });
-    },
-    async saveTest(t) {
-      await db.setJSON(t._id, t);
-    },
-    async listTests() {
-      const { blobs } = await db.list();
-      const out = [];
-      for (let i = 0; i < blobs.length; i += 25) {
-        const part = await Promise.all(blobs.slice(i, i + 25).map((b) => db.get(b.key, { type: 'json' })));
-        out.push(...part.filter(Boolean));
-      }
-      return out.sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
-    },
-    async deleteTest(id) {
-      await db.delete(String(id));
-    },
-  };
-}
-
 async function createStore() {
   const uri = process.env.MONGODB_URI;
   if (uri) return mongoStore(uri);
-  if (process.env.NETLIFY_BLOBS_CONTEXT || globalThis.netlifyBlobsContext || process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME) return blobStore();
+  if (process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    // Serverless muhitda fayl saqlanmaydi — MongoDB shart
+    throw new Error("MONGODB_URI o'rnatilmagan. Netlify'da natijalarni saqlash uchun MongoDB kerak.");
+  }
   return fileStore();
 }
 
