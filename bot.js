@@ -1,12 +1,12 @@
 // Telegram bot: /start bosilganda testni Web App sifatida ochadigan tugma chiqaradi.
-// Kerak: .env da BOT_TOKEN (BotFather'dan) va WEBAPP_URL (masalan https://shaxnoza-math.netlify.app/).
+// Kerak: .env da BOT_TOKEN (BotFather'dan) va WEBAPP_URL (Netlify'dagi sayt manzili).
 // Qo'shimcha kutubxonasiz, Node 18+ fetch va long polling bilan ishlaydi.
 require('dotenv').config();
 
 const TOKEN = process.env.BOT_TOKEN;
-const WEBAPP_URL = process.env.WEBAPP_URL || 'https://shaxnoza-math.netlify.app/';
-if (!TOKEN) {
-  console.error("BOT_TOKEN o'rnatilmagan (.env)");
+const WEBAPP_URL = process.env.WEBAPP_URL;
+if (!TOKEN || !WEBAPP_URL) {
+  console.error("BOT_TOKEN yoki WEBAPP_URL o'rnatilmagan (.env)");
   process.exit(1);
 }
 const API = `https://api.telegram.org/bot${TOKEN}/`;
