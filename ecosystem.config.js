@@ -10,5 +10,14 @@ module.exports = {
       max_memory_restart: '300M',
       env: { NODE_ENV: 'production' },
     },
+    {
+      // Telegram bot (.env da BOT_TOKEN bo'lishi kerak)
+      name: 'matematika-bot',
+      script: 'bot.js',
+      instances: 1,
+      autorestart: true,
+      restart_delay: 5000,
+      max_memory_restart: '150M',
+    },
   ],
 };

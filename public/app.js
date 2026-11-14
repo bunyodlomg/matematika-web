@@ -10,6 +10,13 @@
   };
   const pretty = (t) => t.replace(/ - /g, ' − ');
 
+  // Telegram Web App (bot orqali ochilganda): to'liq ekran va foydalanuvchi ismi
+  const tg = window.Telegram && window.Telegram.WebApp;
+  const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+  if (tg && tg.initData) {
+    try { tg.ready(); tg.expand(); } catch {}
+  }
+
   function show(id) {
     screens.forEach((s) => $(s).classList.toggle('hidden', s !== id));
     window.scrollTo(0, 0);
@@ -68,6 +75,10 @@
     if (profile) {
       $('firstName').value = profile.firstName; $('lastName').value = profile.lastName; $('school').value = profile.school;
       [...$('grades').children].forEach((x) => x.classList.toggle('on', Number(x.dataset.g) === profile.grade));
+    } else if (tgUser) {
+      // Telegram Web App ichida ochilganda ism-familiyani oldindan to'ldiramiz
+      if (!$('firstName').value) $('firstName').value = tgUser.first_name || '';
+      if (!$('lastName').value) $('lastName').value = tgUser.last_name || '';
     }
     show('s-register');
   }
