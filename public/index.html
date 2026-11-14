@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Matematika daftari</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Caveat:wght@700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="brand-mark">±</span>Matematika daftari</div>
+
+  <!-- 1. Ro'yxatdan o'tish -->
+  <section id="s-register" class="hidden">
+    <form class="sheet" id="f-register" autocomplete="off" novalidate>
+      <span class="eyebrow">1–4 sinflar uchun</span>
+      <h1>Keling, tanishamiz!</h1>
+      <p class="lead">Ismingizni yozing va sinfingizni tanlang. Keyin misollar yechamiz.</p>
+      <div class="ops" aria-hidden="true"><span>+</span><span>−</span><span>×</span><span>÷</span></div>
+      <div class="fields">
+        <div class="two">
+          <div class="field"><label for="firstName">Ism</label><input type="text" id="firstName" maxlength="40" placeholder="Aziza"></div>
+          <div class="field"><label for="lastName">Familiya</label><input type="text" id="lastName" maxlength="40" placeholder="Karimova"></div>
+        </div>
+        <div class="field"><label for="school">Maktab</label><input type="text" id="school" maxlength="80" placeholder="15-maktab"></div>
+        <div class="field">
+          <label id="grade-label">Sinf</label>
+          <div class="grades" id="grades" role="group" aria-labelledby="grade-label">
+            <button type="button" data-g="1"><b>1</b><span>sinf</span></button>
+            <button type="button" data-g="2"><b>2</b><span>sinf</span></button>
+            <button type="button" data-g="3"><b>3</b><span>sinf</span></button>
+            <button type="button" data-g="4"><b>4</b><span>sinf</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="err" id="reg-err" role="alert"></div>
+      <button class="btn block" type="submit">Boshlash</button>
+    </form>
+  </section>
+
+  <!-- 2. Daraja tanlash -->
+  <section id="s-levels" class="hidden">
+    <div class="who">
+      <div class="id"><span class="avatar" id="who-avatar"></span><div style="min-width:0"><b id="who-name"></b><span id="who-info"></span></div></div>
+      <button class="btn ghost small" id="b-change">O'zgartirish</button>
+    </div>
+    <h1>Qaysi darajada ishlaymiz?</h1>
+    <p class="lead">Har bir testda 12 ta misol: qo'shish, ayirish, ko'paytirish va bo'lish.</p>
+    <div class="levels">
+      <button class="level easy" data-level="oson">
+        <span class="stars"><i class="on"></i><i></i><i></i></span>
+        <span><b>Oson</b><small>Kichik sonlar</small></span>
+        <span class="sample" data-sample="oson"></span>
+      </button>
+      <button class="level mid" data-level="orta">
+        <span class="stars"><i class="on"></i><i class="on"></i><i></i></span>
+        <span><b>O'rta</b><small>Kattaroq sonlar</small></span>
+        <span class="sample" data-sample="orta"></span>
+      </button>
+      <button class="level hard" data-level="qiyin">
+        <span class="stars"><i class="on"></i><i class="on"></i><i class="on"></i></span>
+        <span><b>Qiyin</b><small>Eng katta sonlar</small></span>
+        <span class="sample" data-sample="qiyin"></span>
+      </button>
+    </div>
+    <div class="err" id="lvl-err" role="alert"></div>
+  </section>
+
+  <!-- 3. Test -->
+  <section id="s-quiz" class="hidden">
+    <div class="sheet">
+      <div class="qtop">
+        <span class="count"><span id="q-num">1</span> <small>/ <span id="q-total">12</span></small></span>
+        <span class="chip" id="q-level"></span>
+        <span class="chip" id="q-time" aria-label="Vaqt">0:00</span>
+      </div>
+      <div class="track" id="track"></div>
+      <div class="cells" id="q-text" aria-live="polite"></div>
+      <div class="answer" id="q-answer" aria-label="Javob"></div>
+      <div class="mark" id="q-mark" role="status"></div>
+      <div class="keypad" id="keypad">
+        <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+        <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+        <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+        <button data-k="del" class="del" aria-label="O'chirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1Z"/><path d="m17 9-6 6M11 9l6 6"/></svg></button>
+        <button data-k="0">0</button>
+        <button data-k="ok" class="go" aria-label="Javobni tekshirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Natija va sertifikat -->
+  <section id="s-result" class="hidden">
+    <div class="sheet">
+      <div class="verdict">
+        <div class="grade-mark" id="r-mark" aria-label="Baho"></div>
+        <div><span class="eyebrow">Test yakunlandi</span><h2 id="r-title"></h2></div>
+      </div>
+      <div class="stats">
+        <div class="stat ok"><b id="r-correct"></b><span>To'g'ri</span></div>
+        <div class="stat bad"><b id="r-wrong"></b><span>Xato</span></div>
+        <div class="stat"><b id="r-time"></b><span>Vaqt</span></div>
+      </div>
+      <div id="r-review-wrap" class="hidden">
+        <div class="eyebrow" style="margin-top:12px">Xatolar ustida ishlash</div>
+        <div class="review" id="r-review"></div>
+      </div>
+    </div>
+    <div class="cert-wrap">
+      <canvas id="cert" width="1600" height="1131" aria-label="Sertifikat"></canvas>
+      <div class="row">
+        <button class="btn" id="b-download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>Sertifikatni yuklab olish</button>
+        <button class="btn ghost" id="b-print"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V4h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v6H7z"/></svg>Chop etish</button>
+      </div>
+      <button class="btn block" id="b-again">Yana test ishlash</button>
+    </div>
+  </section>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

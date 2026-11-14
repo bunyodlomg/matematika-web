@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sinf jurnali</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Caveat:wght@700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+    .top .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .top .actions .btn { flex: 0 0 auto; }
+    .filters { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .filters input, .filters select { padding: 10px 12px; }
+    .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+    .kpi { background: var(--paper); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); min-width: 0; }
+    .kpi b { font-family: var(--f-display); font-size: 1.7rem; font-weight: 800; display: block; line-height: 1.2; font-variant-numeric: tabular-nums; }
+    .kpi span { color: var(--ink-soft); font-size: .78rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .dist { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; min-height: 2.55rem; }
+    .dist span { display: inline-flex; align-items: center; gap: 4px; }
+    .dist em { font-style: normal; font-family: var(--f-hand); color: var(--red); font-size: 1.5rem; }
+    .dist small { font-family: var(--f-display); font-weight: 800; font-size: .95rem; color: var(--ink); background: var(--desk); border-radius: 6px; padding: 0 7px; font-variant-numeric: tabular-nums; }
+
+    .scroll { overflow-x: auto; background: var(--paper); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .tbl { width: 100%; border-collapse: collapse; font-size: .95rem; min-width: 980px; }
+    .tbl th, .tbl td { padding: 11px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+    .tbl th { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); font-weight: 800; }
+    .tbl tr.main { cursor: pointer; transition: background .12s; }
+    .tbl tr.main:hover, .tbl tr.main.open { background: var(--pen-soft); }
+    .tbl td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .tbl .name b { display: block; }
+    .tbl .name span { color: var(--ink-soft); font-size: .85rem; }
+    .score { font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; }
+    .score small { color: var(--ink-soft); font-family: var(--f-body); font-size: .85rem; font-weight: 700; margin-left: 6px; }
+    .meter { height: 5px; border-radius: 3px; background: var(--line); margin-top: 4px; width: 110px; overflow: hidden; }
+    .meter i { display: block; height: 100%; background: var(--pen); }
+    .bh { font-family: var(--f-hand); font-weight: 700; color: var(--red); font-size: 2rem; line-height: 1; display: inline-block; transform: rotate(-6deg); width: 34px; text-align: center; }
+    .bh.na { font-family: var(--f-body); font-size: .85rem; color: var(--ink-soft); transform: none; width: auto; }
+    .mist { display: flex; flex-wrap: wrap; gap: 4px; max-width: 360px; }
+    .mist span { font-family: var(--f-display); font-weight: 600; font-size: .88rem; padding: 1px 8px; border-radius: 6px; background: var(--red-soft); color: var(--red); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .mist .clean { background: var(--ok-soft); color: var(--ok); font-family: var(--f-body); font-weight: 800; }
+    .muted { color: var(--ink-soft); }
+    .open-tag { color: var(--mid); font-weight: 800; font-size: .85rem; }
+
+    .detail > td { background: var(--desk); padding: 16px; }
+    .qgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+    .q { border-radius: 10px; padding: 8px 12px; background: var(--paper); border: 2px solid transparent; font-variant-numeric: tabular-nums; }
+    .q.bad { border-color: var(--red); }
+    .q .n { color: var(--ink-soft); font-size: .76rem; font-weight: 800; display: flex; justify-content: space-between; }
+    .q .e { font-family: var(--f-display); font-weight: 700; font-size: 1.2rem; }
+    .q .r { font-size: .9rem; font-weight: 700; }
+    .q .r .ok { color: var(--ok); } .q .r .bad { color: var(--red); }
+    .q .r s { color: var(--ink-soft); text-decoration-color: var(--red); text-decoration-thickness: 2px; }
+    .detail .foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; align-items: center; }
+    .danger { color: var(--red) !important; }
+    .empty { padding: 48px 16px; text-align: center; color: var(--ink-soft); }
+    .empty b { display: block; font-family: var(--f-display); font-size: 1.2rem; color: var(--ink); }
+    .login { max-width: 420px; margin: 10vh auto 0; }
+    @media (max-width: 900px) {
+      .filters { grid-template-columns: 1fr 1fr; }
+      .filters input { grid-column: 1 / -1; }
+      .kpis { grid-template-columns: repeat(2, 1fr); }
+      .kpis .kpi:last-child { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap" id="login-wrap">
+  <form class="sheet login" id="f-login">
+    <span class="eyebrow">O'qituvchi uchun</span>
+    <h1>Sinf jurnali</h1>
+    <p class="lead">O'quvchilarning natijalari, vaqti va xatolarini ko'rish uchun parolni kiriting.</p>
+    <div class="field"><label for="pw">Parol</label><input type="password" id="pw" autocomplete="current-password"></div>
+    <div class="err" id="login-err" role="alert"></div>
+    <button class="btn block">Kirish</button>
+  </form>
+</div>
+
+<div class="wrap wide hidden" id="panel">
+  <div class="brand"><span class="brand-mark">±</span>Matematika daftari</div>
+  <div class="top">
+    <div><h1>Sinf jurnali</h1><span class="muted" id="updated"></span></div>
+    <div class="actions">
+      <button class="btn ghost small" id="b-refresh">Yangilash</button>
+      <a class="btn small" id="b-csv" href="#">Excel'ga yuklab olish</a>
+      <button class="btn ghost small" id="b-logout">Chiqish</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input type="search" id="f-q" placeholder="Ism yoki familiya" aria-label="Ism yoki familiya bo'yicha qidirish">
+    <select id="f-school" aria-label="Maktab"><option value="">Barcha maktablar</option></select>
+    <select id="f-grade" aria-label="Sinf"><option value="">Barcha sinflar</option><option value="1">1-sinf</option><option value="2">2-sinf</option><option value="3">3-sinf</option><option value="4">4-sinf</option></select>
+    <select id="f-level" aria-label="Daraja"><option value="">Barcha darajalar</option><option value="oson">Oson</option><option value="orta">O'rta</option><option value="qiyin">Qiyin</option></select>
+    <select id="f-status" aria-label="Holat"><option value="done">Tugallanganlar</option><option value="">Hammasi</option><option value="open">Tugallanmaganlar</option></select>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><b id="k-tests">0</b><span>Testlar</span></div>
+    <div class="kpi"><b id="k-students">0</b><span>O'quvchilar</span></div>
+    <div class="kpi"><b id="k-avg">—</b><span>O'rtacha natija</span></div>
+    <div class="kpi"><b id="k-time">—</b><span>O'rtacha vaqt</span></div>
+    <div class="kpi"><div class="dist" id="k-dist"></div><span>Baholar</span></div>
+  </div>
+
+  <div class="scroll">
+    <table class="tbl">
+      <thead><tr>
+        <th>O'quvchi</th><th>Sinf</th><th>Daraja</th><th>Natija</th><th>Baho</th><th>Vaqt</th><th>Xato qilgan misollari</th><th>Sana</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p class="muted" style="font-size:.9rem;margin-top:10px">Qatorni bosing: har bir misol, o'quvchining javobi va unga ketgan vaqt ochiladi.</p>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>
